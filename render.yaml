@@ -1,0 +1,21 @@
+# Render Blueprint — EduHelper
+# Foydalanish: render.com → "New +" → "Blueprint" → shu reponi tanlang.
+# Env qiymatlari import paytida so'raladi (maxfiy, render.yaml'da yozilmaydi).
+
+services:
+  - type: web
+    name: eduhelper
+    runtime: node
+    repo: https://github.com/gayratov993/eduhelper
+    plan: free
+    region: frankfurt
+    healthCheckPath: /
+    buildCommand: npm install && npm --prefix client install && npm run build
+    startCommand: node index.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: NODE_VERSION
+        value: 20
