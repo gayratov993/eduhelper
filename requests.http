@@ -1,0 +1,64 @@
+### ── AUTH ──
+
+### Ro'yxatdan o'tish (201)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{ "username": "azizjon", "password": "secret123" }
+
+### Kirish (200 → token)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{ "username": "azizjon", "password": "secret123" }
+
+### XATOLIK: noto'g'ri parol → 401
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{ "username": "azizjon", "password": "yomon" }
+
+### Joriy foydalanuvchi (token kerak)
+GET http://localhost:3000/api/auth/me
+Authorization: Bearer TOKEN_HERE
+
+### ── TASKS (token kerak) ──
+
+### Barcha vazifalar (shaxsiy)
+GET http://localhost:3000/api/tasks
+Authorization: Bearer TOKEN_HERE
+
+### Yangi vazifa (201)
+POST http://localhost:3000/api/tasks
+Authorization: Bearer TOKEN_HERE
+Content-Type: application/json
+
+{ "title": "Express routing amaliyoti", "fan": "Dasturlash", "dueDate": "2026-09-22" }
+
+### XATOLIK: bo'sh nom → 400 (server xabari)
+POST http://localhost:3000/api/tasks
+Authorization: Bearer TOKEN_HERE
+Content-Type: application/json
+
+{ "title": "", "fan": "Dasturlash" }
+
+### XATOLIK: noto'g'ri fan → 400 (enum)
+POST http://localhost:3000/api/tasks
+Authorization: Bearer TOKEN_HERE
+Content-Type: application/json
+
+{ "title": "Test", "fan": "Sport" }
+
+### Vazifani bajarilgan qilish (PATCH) → REAL_ID o'rniga haqiqiy id
+PATCH http://localhost:3000/api/tasks/REAL_ID
+Authorization: Bearer TOKEN_HERE
+Content-Type: application/json
+
+{ "isDone": true }
+
+### Vazifani o'chirish (DELETE) → REAL_ID o'rniga haqiqiy id
+DELETE http://localhost:3000/api/tasks/REAL_ID
+Authorization: Bearer TOKEN_HERE
+
+### Token'ni qanday olamiz: curl bilan
+# curl -X POST http://localhost:3000/api/auth/login -H "Content-Type: application/json" -d '{"username":"azizjon","password":"secret123"}'
