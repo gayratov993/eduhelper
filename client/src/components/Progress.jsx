@@ -1,3 +1,5 @@
+import { t } from '../i18n'
+
 export default function Progress({ done, total }) {
   const percent = total ? Math.round((done / total) * 100) : 0
   const angle = total ? Math.round((done / total) * 360) : 0
@@ -17,9 +19,9 @@ export default function Progress({ done, total }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="font-display text-base font-bold text-ink">Taraqqiyot</h2>
+            <h2 className="font-display text-base font-bold text-ink">{t('progress.title')}</h2>
             <span className="text-sm font-semibold text-accent">
-              {done} / {total} bajarildi
+              {t('progress.count', { done, total })}
             </span>
           </div>
           <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface">
@@ -30,10 +32,10 @@ export default function Progress({ done, total }) {
           </div>
           <p className="mt-2 text-xs text-muted">
             {total === 0
-              ? 'Birinchi vazifangizni qo\'shing va seriyani boshlang'
+              ? t('progress.empty')
               : percent === 100
-                ? 'Mukammal! Barchasini bajardingiz — seriyangiz saqlandi'
-                : `Yana ${total - done} ta vazifa qoldi. Mashq uzluksizligini buzmaymiz!`}
+                ? t('progress.full')
+                : t('progress.left', { n: total - done })}
           </p>
         </div>
       </div>

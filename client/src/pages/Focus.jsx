@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { FANLAR, FAN_STYLE } from '../constants'
 import { isOverdue, isSameDay, startOfDay } from '../utils/date'
+import { t } from '../i18n'
+import { recordFocus } from '../store/focusSlice'
 import { Timer, Target, Coffee, Leaf, Play, Pause, Refresh, Alert, Sparkles } from '../components/icons'
 
 const MODES = [
-  { key: 'focus', label: 'Fokus', minutes: 25, Icon: Target },
-  { key: 'quick', label: 'Qisqa dam', minutes: 5, Icon: Coffee },
-  { key: 'long', label: 'Uzoq dam', minutes: 15, Icon: Leaf },
+  { key: 'focus', keyLabel: 'focus.header', minutes: 25, Icon: Target },
+  { key: 'quick', keyLabel: 'focus.short', minutes: 5, Icon: Coffee },
+  { key: 'long', keyLabel: 'focus.long', minutes: 15, Icon: Leaf },
 ]
 
 const DAY_KEY = () => {
@@ -51,6 +53,7 @@ function beep() {
 }
 
 export default function Focus() {
+  const dispatch = useDispatch()
   const items = useSelector((s) => s.tasks.items)
   const [mode, setMode] = useState('focus')
   const [fan, setFan] = useState('all')
@@ -91,6 +94,7 @@ export default function Focus() {
           } catch {
             /* noop */
           }
+          dispatch(recordFocus({ fan, minutes: active.minutes }))
           setTimeout(() => pickMode('quick'), 1200)
         } else {
           reset()
@@ -102,7 +106,7 @@ export default function Focus() {
     completedRef.current = false
     const id = setTimeout(() => setRemaining((r) => r - 1), 1000)
     return () => clearTimeout(id)
-  }, [running, remaining, day, mode, active]) // eslint-disable-line
+  }, [running, remaining, day, mode, active, fan, dispatch]) // eslint-disable-line
 
   const overdue = useMemo(() => items.filter(isOverdue).length, [items])
 
@@ -113,10 +117,8 @@ export default function Focus() {
           <Timer size={22} />
         </span>
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">Fokus</h1>
-          <p className="mt-0.5 text-sm text-muted">
-            Pomodoro: 25 daqiqa diqqat, 5 daqiqa dam. Bu yerda haqiqiy fokus vaqti hisoblanadi.
-          </p>
+          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{t('focus.header')}</h1>
+          <p className="mt-0.5 text-sm text-muted">{t('focus.headerText')}</p>
         </div>
       </header>
 
@@ -133,7 +135,7 @@ export default function Focus() {
                 }`}
               >
                 <m.Icon size={15} />
-                {m.label} · {m.minutes}'
+                {t(m.keyLabel)} · {m.minutes}'
               </button>
             ))}
           </div>
@@ -150,7 +152,7 @@ export default function Focus() {
                   {fmt(remaining)}
                 </span>
                 <span className="mt-1 text-xs font-bold tracking-widest text-faint uppercase">
-                  {active.label} · {percent}%
+                  {t(active.keyLabel)} · {percent}%
                 </span>
               </div>
             </div>
@@ -164,28 +166,32 @@ export default function Focus() {
               }`}
             >
               {running ? <Pause size={16} /> : <Play size={16} />}
-              {running ? "To'xtatish" : remaining === total ? 'Boshlash' : 'Davom etish'}
+              {running
+                ? t('focus.stop')
+                : remaining === total
+                  ? t('focus.start')
+                  : t('focus.resume')}
             </button>
             <button
               onClick={reset}
               className="flex cursor-pointer items-center gap-1.5 rounded-2xl border border-line bg-surface px-6 py-3 text-sm font-bold text-muted transition hover:text-ink"
             >
               <Refresh size={15} />
-              Qayta
+              {t('focus.reset')}
             </button>
           </div>
 
           {/* Fan (sessiya uchun belgi) */}
           <div className="mt-6 w-full max-w-sm">
             <label className="mb-1.5 block text-[11px] font-bold tracking-wider text-faint uppercase">
-              Bu sessiyada qaysi fan?
+              {t('focus.subjectLabel')}
             </label>
             <select
               value={fan}
               onChange={(e) => setFan(e.target.value)}
               className="w-full cursor-pointer rounded-xl border border-line bg-surface px-4 py-2.5 text-sm text-ink outline-none transition focus:border-accent/60"
             >
-              <option value="all">Umumiy</option>
+              <option value="all">{t('focus.general')}</option>
               {FANLAR.map((f) => (
                 <option key={f} value={f}>
                   {FAN_STYLE[f].select}
@@ -198,46 +204,42 @@ export default function Focus() {
         {/* Bugungi natija */}
         <section className="flex flex-col gap-4">
           <div className="rounded-2xl border border-line bg-card p-5">
-            <h2 className="font-display text-base font-bold text-ink">Bugungi fokus</h2>
+            <h2 className="font-display text-base font-bold text-ink">{t('focus.today')}</h2>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-line bg-surface p-4 text-center">
                 <p className="font-display text-3xl font-extrabold text-accent">{day.minutes}</p>
-                <p className="mt-1 text-[11px] font-semibold text-muted">daqiqa diqqat</p>
+                <p className="mt-1 text-[11px] font-semibold text-muted">{t('focus.minutes')}</p>
               </div>
               <div className="rounded-xl border border-line bg-surface p-4 text-center">
                 <p className="font-display text-3xl font-extrabold text-accent">{day.sessions}</p>
-                <p className="mt-1 text-[11px] font-semibold text-muted">sessiya</p>
+                <p className="mt-1 text-[11px] font-semibold text-muted">{t('focus.sessions')}</p>
               </div>
             </div>
             <p className="mt-3 text-[11px] text-faint italic">
-              Bitta fokus = {MODES[0].minutes} daqiqa uzluksiz diqqat. Statistika sahifasida natijangiz ko'rinadi.
+              {t('focus.note', { n: MODES[0].minutes })}
             </p>
           </div>
 
           <div className="rounded-2xl border border-line bg-card p-5">
-            <h2 className="font-display text-base font-bold text-ink">Reja bosimi</h2>
+            <h2 className="font-display text-base font-bold text-ink">{t('focus.pressure')}</h2>
             <p className="mt-2 text-sm text-muted">
               {overdue > 0 ? (
                 <span className="flex items-start gap-2">
                   <Alert size={16} className="mt-0.5 shrink-0 text-rose-500" />
-                  {overdue} ta vazifangiz muddatidan o'tgan. Ayni shu lahzada 25 daqiqalik sessiya boshlasangiz,
-                  ularga qarshi hujum boshlandi.
+                  {t('focus.pressureOverdue', { n: overdue })}
                 </span>
               ) : (
-                'Barcha muddatlar tartibda! Fokusni tanlang va ilgarilab qoling.'
+                t('focus.pressureOk')
               )}
             </p>
             <Link to="/" className="mt-3 inline-block text-xs font-bold text-accent hover:underline">
-              Bosh sahifaga →
+              {t('focus.backHome')}
             </Link>
           </div>
 
           <p className="flex items-start gap-2 text-[11px] text-faint">
             <Sparkles size={14} className="mt-0.5 shrink-0" />
-            <span>
-              Nega oddiy yozuv emas? Yozuv faqat yozadi. Planner esa sizni muddatga bog'laydi, fokusni o'lchaydi va
-              statistikani qurib beradi — reja faol boshqariladi, passiv qog'oz bo'lib qolmaydi.
-            </span>
+            <span>{t('focus.why')}</span>
           </p>
         </section>
       </div>

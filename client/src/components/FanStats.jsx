@@ -1,11 +1,12 @@
 import { FANLAR, FAN_STYLE, BADGE_BASE } from '../constants'
+import { t } from '../i18n'
 
 export default function FanStats({ items }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-line bg-card p-5 shadow-lg shadow-black/5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-base font-bold text-ink">Fanlar bo'yicha holat</h3>
-        <span className="text-xs font-semibold text-faint">{items.length} ta vazifa</span>
+        <h3 className="font-display text-base font-bold text-ink">{t('fanstats.title')}</h3>
+        <span className="text-xs font-semibold text-faint">{t('fanstats.tasks', { n: items.length })}</span>
       </div>
 
       <div className="flex flex-col gap-4">

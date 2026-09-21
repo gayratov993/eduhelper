@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { addTask } from '../store/tasksSlice'
 import { FANLAR, FAN_STYLE } from '../constants'
+import { t } from '../i18n'
 
 export default function AddTaskForm() {
   const dispatch = useDispatch()
@@ -38,7 +39,7 @@ export default function AddTaskForm() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         maxLength={120}
-        placeholder="Vazifa nomi… masalan: Chiziqli algebra amaliyoti"
+        placeholder={t('task.addPlaceholder')}
         className="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink placeholder-faint outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
       />
 
@@ -67,7 +68,7 @@ export default function AddTaskForm() {
           disabled={busy}
           className="cursor-pointer rounded-xl bg-accent px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {busy ? 'Qo\'shilmoqda…' : '+ Qo\'shish'}
+          {busy ? t('task.adding') : t('task.add')}
         </button>
       </div>
     </form>

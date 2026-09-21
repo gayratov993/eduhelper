@@ -1,17 +1,18 @@
 import { FANLAR, FAN_STYLE } from '../constants'
+import { t } from '../i18n'
 import { Search } from './icons'
 
 const STATUS = [
-  { value: 'all', label: 'Barcha' },
-  { value: 'active', label: 'Faol' },
-  { value: 'done', label: 'Bajarilgan' },
+  { value: 'all', key: 'filter.all' },
+  { value: 'active', key: 'filter.active' },
+  { value: 'done', key: 'filter.done' },
 ]
 
 const SORTS = [
-  { value: 'new', label: 'Eng yangi' },
-  { value: 'due', label: 'Muddat bo\'yicha' },
-  { value: 'name', label: 'Nomi bo\'yicha' },
-  { value: 'fan', label: 'Fan bo\'yicha' },
+  { value: 'new', key: 'filter.sortNew' },
+  { value: 'due', key: 'filter.sortDue' },
+  { value: 'name', key: 'filter.sortName' },
+  { value: 'fan', key: 'filter.sortFan' },
 ]
 
 export default function Filters({ status, fan, search, sort, onStatus, onFan, onSearch, onSort }) {
@@ -33,7 +34,7 @@ export default function Filters({ status, fan, search, sort, onStatus, onFan, on
             type="search"
             value={search}
             onChange={(e) => onSearch(e.target.value)}
-            placeholder="Vazifalarni qidirish…"
+            placeholder={t('filter.search')}
             className="w-full rounded-xl border border-line bg-surface py-2.5 pr-4 pl-9 text-sm outline-none transition focus:border-accent/60"
           />
         </div>
@@ -44,25 +45,25 @@ export default function Filters({ status, fan, search, sort, onStatus, onFan, on
         >
           {SORTS.map((s) => (
             <option key={s.value} value={s.value}>
-              {s.label}
+              {t(s.key)}
             </option>
           ))}
         </select>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs font-semibold tracking-wider text-faint uppercase">Holat</span>
+        <span className="mr-1 text-xs font-semibold tracking-wider text-faint uppercase">{t('filter.status')}</span>
         {STATUS.map((s) => (
           <button key={s.value} className={chip(status === s.value)} onClick={() => onStatus(s.value)}>
-            {s.label}
+            {t(s.key)}
           </button>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="mr-1 text-xs font-semibold tracking-wider text-faint uppercase">Fan</span>
+        <span className="mr-1 text-xs font-semibold tracking-wider text-faint uppercase">{t('filter.subject')}</span>
         <button className={chip(fan === 'all')} onClick={() => onFan('all')}>
-          Hamma fanlar
+          {t('filter.allSubjects')}
         </button>
         {FANLAR.map((f) => (
           <button key={f} className={chip(fan === f)} onClick={() => onFan(f)}>

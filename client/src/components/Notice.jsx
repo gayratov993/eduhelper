@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { clearNotice, fetchTasks } from '../store/tasksSlice'
+import { t } from '../i18n'
 import { Refresh, Alert, X } from './icons'
 
 export default function Notice({ notice, offline }) {
@@ -24,13 +25,13 @@ export default function Notice({ notice, offline }) {
           onClick={() => dispatch(fetchTasks())}
           className="rounded-lg bg-amber-500/20 px-3 py-1.5 text-xs font-bold text-amber-800 transition hover:bg-amber-500/30 dark:text-amber-100"
         >
-          Qayta urinish
+          {t('notice.retry')}
         </button>
       )}
       <button
         onClick={() => dispatch(clearNotice())}
         className="rounded-lg px-2 py-1.5 text-xs text-faint transition hover:bg-app hover:text-ink"
-        aria-label="Yopish"
+        aria-label={t('common.close')}
       >
         <X size={14} />
       </button>

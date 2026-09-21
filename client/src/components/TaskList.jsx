@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import { toggleTask, removeTask, editTask } from '../store/tasksSlice'
 import { FANLAR, FAN_STYLE, BADGE_BASE } from '../constants'
 import { dueMeta } from '../utils/date'
+import { t } from '../i18n'
 import { Pencil, Trash, Collection } from './icons'
 
 const DUE_TONE = {
@@ -86,14 +87,14 @@ function TaskEdit({ task, onCancel }) {
           disabled={busy}
           className="cursor-pointer rounded-xl bg-accent px-4 py-2 text-xs font-bold text-white transition hover:brightness-110 disabled:opacity-60"
         >
-          {busy ? 'Saqlanmoqda…' : 'Saqlash'}
+          {busy ? t('task.saving') : t('task.save')}
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="cursor-pointer rounded-xl border border-line bg-surface px-4 py-2 text-xs font-bold text-muted transition hover:text-ink"
         >
-          Bekor qilish
+          {t('task.cancel')}
         </button>
       </div>
     </form>
@@ -122,7 +123,7 @@ function TaskItem({ task, editing, onEdit }) {
           checked={task.isDone}
           onChange={(e) => dispatch(toggleTask({ id: task._id, isDone: e.target.checked }))}
           className="h-5 w-5 cursor-pointer appearance-none rounded-md border-2 border-faint bg-transparent transition checked:border-accent checked:bg-accent"
-          title={task.isDone ? 'Bajarilmagan deb belgilash' : 'Bajarilgan deb belgilash'}
+          title={task.isDone ? t('task.undoneLabel') : t('task.doneLabel')}
         />
       </label>
 
@@ -152,8 +153,8 @@ function TaskItem({ task, editing, onEdit }) {
           <button
             onClick={onEdit}
             className="cursor-pointer rounded-lg px-2 py-1 text-faint transition hover:bg-accent-soft hover:text-accent"
-            title="Tahrirlash"
-            aria-label="Vazifani tahrirlash"
+            title={t('task.edit')}
+            aria-label={t('task.edit')}
           >
             <Pencil size={15} />
           </button>
@@ -161,8 +162,8 @@ function TaskItem({ task, editing, onEdit }) {
         <button
           onClick={() => dispatch(removeTask(task._id))}
           className="cursor-pointer rounded-lg px-2 py-1 text-faint transition hover:bg-rose-500/15 hover:text-rose-400"
-          title="O'chirish"
-          aria-label="Vazifani o'chirish"
+          title={t('task.delete')}
+          aria-label={t('task.delete')}
         >
           <Trash size={15} />
         </button>
@@ -180,10 +181,8 @@ export default function TaskList({ items }) {
         <span className="grid h-16 w-16 place-items-center rounded-2xl bg-surface text-faint">
           <Collection size={30} />
         </span>
-        <p className="mt-4 text-sm font-semibold text-ink">Bu bo'limda vazifa yo'q</p>
-        <p className="mt-1 max-w-xs text-xs text-muted">
-          Boshqa filtrni tanlang yoki yuqoridan yangi vazifa qo'shing.
-        </p>
+        <p className="mt-4 text-sm font-semibold text-ink">{t('task.emptyTitle')}</p>
+        <p className="mt-1 max-w-xs text-xs text-muted">{t('task.emptyBody')}</p>
       </div>
     )
   }

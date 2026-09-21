@@ -1,3 +1,5 @@
+import { t, langCode, LOCALES } from '../i18n'
+
 export function startOfDay(d) {
   const x = new Date(d)
   x.setHours(0, 0, 0, 0)
@@ -20,15 +22,15 @@ export function fmtDate(d) {
 }
 
 export function fmtDateLong(d) {
-  return new Date(d).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'long' })
+  return new Date(d).toLocaleDateString(LOCALES[langCode()], { day: 'numeric', month: 'long' })
 }
 
 export function fmtDayShort(d) {
-  return new Date(d).toLocaleDateString('uz-UZ', { weekday: 'short' })
+  return new Date(d).toLocaleDateString(LOCALES[langCode()], { weekday: 'short' })
 }
 
 export function todayLabel() {
-  return new Date().toLocaleDateString('uz-UZ', {
+  return new Date().toLocaleDateString(LOCALES[langCode()], {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -36,14 +38,14 @@ export function todayLabel() {
 }
 
 export function dueMeta(task) {
-  if (!task.dueDate) return { text: 'Muddatsiz', tone: 'muted' }
+  if (!task.dueDate) return { text: t('due.none'), tone: 'muted' }
   const diff = Math.round((startOfDay(new Date(task.dueDate)) - startOfDay(new Date())) / 86400000)
 
   if (task.isDone) return { text: fmtDate(new Date(task.dueDate)), tone: 'done' }
   if (diff < 0)
-    return { text: `Muddati o'tdi · ${fmtDate(new Date(task.dueDate))}`, tone: 'overdue' }
-  if (diff === 0) return { text: 'Bugun topshirish', tone: 'today' }
-  if (diff === 1) return { text: 'Ertaga', tone: 'soon' }
+    return { text: t('due.overdue', { date: fmtDate(new Date(task.dueDate)) }), tone: 'overdue' }
+  if (diff === 0) return { text: t('due.today'), tone: 'today' }
+  if (diff === 1) return { text: t('due.tomorrow'), tone: 'soon' }
   return { text: fmtDate(new Date(task.dueDate)), tone: 'future' }
 }
 

@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { logout } from '../store/authSlice'
 import { useTheme } from '../theme'
 import { isOverdue, weekDoneCount } from '../utils/date'
+import { t } from '../i18n'
 import { Avatar } from '../components/brand'
+import LangSwitch from '../components/LangSwitch'
 import { User, Moon, Sun, Collection, Check, Bolt, Alert } from '../components/icons'
 
 export default function Profile() {
@@ -25,8 +27,8 @@ export default function Profile() {
           <User size={22} />
         </span>
         <div>
-          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">Profil</h1>
-          <p className="mt-0.5 text-sm text-muted">Hisobingiz va ko'rinish sozlamalari.</p>
+          <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{t('profile.header')}</h1>
+          <p className="mt-0.5 text-sm text-muted">{t('profile.headerText')}</p>
         </div>
       </header>
 
@@ -38,34 +40,34 @@ export default function Profile() {
               <Avatar name={user?.username} size={76} rounded="rounded-2xl" />
               <div className="pb-1">
                 <p className="font-display text-xl font-extrabold text-ink">@{user?.username}</p>
-                <p className="text-xs text-muted">Bitta hisob — istalgan qurilmada saqlanadi</p>
+                <p className="text-xs text-muted">{t('profile.savedAnywhere')}</p>
               </div>
             </div>
             <Link to="/" className="rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white transition hover:brightness-110">
-              Bosh sahifa →
+              {t('profile.home')}
             </Link>
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: 'Vazifalar', value: total, Icon: Collection },
-              { label: 'Bajarilgan', value: done, Icon: Check },
-              { label: 'Bu hafta', value: weekDone, Icon: Bolt },
-              { label: 'Muddati o\'tgan', value: overdue, Icon: Alert },
-            ].map(({ label, value, Icon }) => (
-              <div key={label} className="rounded-xl border border-line bg-surface p-3.5 text-center">
+              { key: 'profile.statTasks', value: total, Icon: Collection },
+              { key: 'profile.statDone', value: done, Icon: Check },
+              { key: 'profile.statWeek', value: weekDone, Icon: Bolt },
+              { key: 'profile.statOverdue', value: overdue, Icon: Alert },
+            ].map(({ key, value, Icon }) => (
+              <div key={key} className="rounded-xl border border-line bg-surface p-3.5 text-center">
                 <span className="mx-auto grid h-8 w-8 place-items-center rounded-lg bg-app text-muted">
                   <Icon size={15} />
                 </span>
                 <p className="mt-1.5 font-display text-xl font-extrabold text-ink">{value}</p>
-                <p className="text-[11px] font-semibold text-muted">{label}</p>
+                <p className="text-[11px] font-semibold text-muted">{t(key)}</p>
               </div>
             ))}
           </div>
 
           <div className="mt-6">
             <div className="mb-1.5 flex items-center justify-between text-xs">
-              <span className="font-bold text-muted">Umumiy bajarish</span>
+              <span className="font-bold text-muted">{t('profile.overallDone')}</span>
               <span className="font-extrabold text-accent">{percent}%</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-surface">
@@ -79,9 +81,9 @@ export default function Profile() {
         <div>
           <p className="flex items-center gap-2 text-sm font-bold text-ink">
             {dark ? <Moon size={16} /> : <Sun size={16} />}
-            {dark ? 'Tun rejimi' : 'Kunduz rejimi'}
+            {dark ? t('theme.dark') : t('theme.light')}
           </p>
-          <p className="mt-0.5 text-xs text-muted">Ko'zdan ozor bermaslik uchun rejimni almashtiring.</p>
+          <p className="mt-0.5 text-xs text-muted">{t('theme.subtle')}</p>
         </div>
         <button
           onClick={toggle}
@@ -95,15 +97,17 @@ export default function Profile() {
       </section>
 
       <section className="rounded-2xl border border-rose-500/25 bg-rose-500/5 p-5">
-        <p className="text-sm font-bold text-rose-600 dark:text-rose-300">Sessiya</p>
-        <p className="mt-1 text-xs text-muted">Hisobdan chiqib, boshqa foydalanuvchi sifatida kirishingiz mumkin.</p>
+        <p className="text-sm font-bold text-rose-600 dark:text-rose-300">{t('profile.session')}</p>
+        <p className="mt-1 text-xs text-muted">{t('profile.sessionText')}</p>
         <button
           onClick={() => dispatch(logout())}
           className="mt-3 cursor-pointer rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2.5 text-xs font-bold text-rose-600 transition hover:bg-rose-500/20 dark:text-rose-300"
         >
-          Chiqish
+          {t('profile.logout')}
         </button>
       </section>
+
+      <LangSwitch />
     </div>
   )
 }

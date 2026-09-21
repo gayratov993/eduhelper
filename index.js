@@ -6,6 +6,8 @@ import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Task } from './models/Task.js'
 import { User } from './models/User.js'
+import { Goal } from './models/Goal.js'
+import { FocusSession } from './models/FocusSession.js'
 import { signToken, authRequired } from './middleware/auth.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -127,6 +129,119 @@ app.delete('/api/tasks/:id', authRequired, async (req, res) => {
     if (!owned) return
     await Task.findByIdAndDelete(owned._id)
     res.status(200).json({ ok: true })
+  } catch (error) {
+    sendError(res, error)
+  }
+})
+
+/* ───────────── Goals (maqsadlar, auth talab) ───────────── */
+
+function periodFilter(period, userId) {
+  const now = new Date()
+  const base = { user: userId, isDone: true }
+  if (period === 'week') {
+    const weekStart = new Date(now)
+    weekStart.setDate(now.getDate() - 6)
+    weekStart.setHours(0, 0, 0, 0)
+    return { ...base, doneAt: { $gte: weekStart } }
+  }
+  if (period === 'month') {
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    return { ...base, doneAt: { $gte: monthStart } }
+  }
+  return base
+}
+
+app.get('/api/goals', authRequired, async (req, res) => {
+  try {
+    const goals = await Goal.find({ user: req.userId }).sort({ createdAt: 1 })
+    const withDone = await Promise.all(
+      goals.map(async (goal) => {
+        const done = await Task.countDocuments(periodFilter(goal.period, req.userId))
+        return {
+          _id: goal._id,
+          target: goal.target,
+          period: goal.period,
+          createdAt: goal.createdAt,
+          done,
+        }
+      }),
+    )
+    res.json(withDone)
+  } catch (error) {
+    sendError(res, error)
+  }
+})
+
+app.post('/api/goals', authRequired, async (req, res) => {
+  try {
+    const body = { target: req.body.target, period: req.body.period }
+    const goal = await Goal.create({ ...body, user: req.userId })
+    const done = await Task.countDocuments(periodFilter(goal.period, req.userId))
+    res.status(201).json({
+      _id: goal._id,
+      target: goal.target,
+      period: goal.period,
+      createdAt: goal.createdAt,
+      done,
+    })
+  } catch (error) {
+    sendError(res, error)
+  }
+})
+
+app.delete('/api/goals/:id', authRequired, async (req, res) => {
+  try {
+    const goal = await Goal.findOne({ _id: req.params.id, user: req.userId })
+    if (!goal) {
+      return res.status(404).json({ error: 'Bunday maqsad topilmadi' })
+    }
+    await Goal.findByIdAndDelete(goal._id)
+    res.status(200).json({ ok: true })
+  } catch (error) {
+    sendError(res, error)
+  }
+})
+
+/* ───────────── Focus sessiyalari (statistika uchun) ───────────── */
+
+app.get('/api/focus', authRequired, async (req, res) => {
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days, 10) || 7, 1), 90)
+    const end = new Date()
+    end.setHours(23, 59, 59, 999)
+    const start = new Date(end)
+    start.setDate(start.getDate() - (days - 1))
+    start.setHours(0, 0, 0, 0)
+
+    const sessions = await FocusSession.find({ user: req.userId, date: { $gte: start, $lte: end } }).sort({ date: 1 })
+
+    const byFanMap = new Map()
+    let totalMinutes = 0
+    for (const s of sessions) {
+      totalMinutes += s.minutes
+      const cur = byFanMap.get(s.fan) || { fan: s.fan, minutes: 0, sessions: 0 }
+      cur.minutes += s.minutes
+      cur.sessions += 1
+      byFanMap.set(s.fan, cur)
+    }
+    const byFan = [...byFanMap.values()].sort((a, b) => b.minutes - a.minutes)
+
+    res.json({ days, totalMinutes, totalSessions: sessions.length, byFan })
+  } catch (error) {
+    sendError(res, error)
+  }
+})
+
+app.post('/api/focus', authRequired, async (req, res) => {
+  try {
+    const session = await FocusSession.create({
+      user: req.userId,
+      fan: String(req.body.fan || '').trim() || 'Boshqa',
+      minutes: req.body.minutes,
+      date: new Date(),
+    })
+    res.status(201).json(session)
   } catch (error) {
     sendError(res, error)
   }

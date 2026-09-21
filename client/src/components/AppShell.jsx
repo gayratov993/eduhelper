@@ -3,16 +3,18 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { logout } from '../store/authSlice'
 import { useTheme } from '../theme'
+import { t } from '../i18n'
 import { todayLabel } from '../utils/date'
 import { Logo, Avatar } from './brand'
+import LangSwitch from './LangSwitch'
 import { Home, Chart, Calendar, Timer, User, Sun, Moon, LogOut, Menu, X } from './icons'
 
 const NAV = [
-  { to: '/', label: 'Bosh sahifa', Icon: Home, end: true },
-  { to: '/stats', label: 'Statistika', Icon: Chart },
-  { to: '/calendar', label: 'Kalendar', Icon: Calendar },
-  { to: '/focus', label: 'Fokus', Icon: Timer },
-  { to: '/profile', label: 'Profil', Icon: User },
+  { to: '/', key: 'nav.home', Icon: Home, end: true },
+  { to: '/stats', key: 'nav.stats', Icon: Chart },
+  { to: '/calendar', key: 'nav.calendar', Icon: Calendar },
+  { to: '/focus', key: 'nav.focus', Icon: Timer },
+  { to: '/profile', key: 'nav.profile', Icon: User },
 ]
 
 function Brand() {
@@ -21,7 +23,7 @@ function Brand() {
       <Logo size={40} />
       <div className="leading-tight">
         <p className="font-display text-sm font-bold text-ink">EduHelper</p>
-        <p className="text-[11px] text-faint">O'quv vazifalarini boshqarish</p>
+        <p className="text-[11px] text-faint">{t('brand.tagline')}</p>
       </div>
     </div>
   )
@@ -33,11 +35,11 @@ function ThemeButton() {
     <button
       onClick={toggle}
       className="flex w-full cursor-pointer items-center justify-between rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm font-semibold text-muted transition hover:text-ink"
-      title="Kunduz/tun rejimini almashtirish"
+      title={t('theme.title')}
     >
       <span className="flex items-center gap-2">
         {dark ? <Moon size={16} /> : <Sun size={16} />}
-        {dark ? 'Tun rejimi' : 'Kunduz rejimi'}
+        {dark ? t('theme.dark') : t('theme.light')}
       </span>
       <span className={`relative h-5 w-9 rounded-full transition ${dark ? 'bg-accent' : 'bg-faint'} `}>
         <span
@@ -56,10 +58,10 @@ function NavList({ onNavigate }) {
 
   return (
     <nav className="flex flex-col gap-1.5">
-      {NAV.map(({ to, label, Icon, end }) => (
+      {NAV.map(({ to, key, Icon, end }) => (
         <NavLink key={to} to={to} end={end} className={cls} onClick={onNavigate}>
           <Icon size={17} />
-          {label}
+          {t(key)}
         </NavLink>
       ))}
     </nav>
@@ -76,13 +78,13 @@ function UserBlock() {
         <Avatar name={user.username} size={36} rounded="rounded-xl" />
         <div className="min-w-0 leading-tight">
           <p className="truncate text-sm font-bold text-ink">{user.username}</p>
-          <p className="text-[11px] text-faint">Talaba · EDU</p>
+          <p className="text-[11px] text-faint">{t('user.role')}</p>
         </div>
       </div>
       <button
         onClick={() => dispatch(logout())}
         className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-lg text-faint transition hover:bg-rose-500/15 hover:text-rose-400"
-        title="Chiqish"
+        title={t('user.logout')}
       >
         <LogOut size={15} />
       </button>
@@ -108,6 +110,7 @@ export default function AppShell() {
             {todayLabel()}
           </p>
           <ThemeButton />
+          <LangSwitch compact />
           <UserBlock />
         </div>
       </aside>
@@ -142,6 +145,7 @@ export default function AppShell() {
             <NavList onNavigate={() => setOpen(false)} />
             <div className="mt-auto flex flex-col gap-3">
               <ThemeButton />
+              <LangSwitch compact />
               <UserBlock />
             </div>
           </div>

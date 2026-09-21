@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { fetchTasks } from '../store/tasksSlice'
 import { isOverdue, isSameDay, startOfDay, todayLabel, dueMeta } from '../utils/date'
+import { t } from '../i18n'
 import AddTaskForm from '../components/AddTaskForm'
 import Notice from '../components/Notice'
 import Progress from '../components/Progress'
 import FanStats from '../components/FanStats'
+import GoalsCard from '../components/GoalsCard'
 import Filters from '../components/Filters'
 import TaskList from '../components/TaskList'
 import { Collection, Check, Clock, Alert, Timer, Refresh } from '../components/icons'
@@ -28,10 +30,10 @@ function StatCard({ icon, label, value, hint, tone }) {
 
 function greet() {
   const h = new Date().getHours()
-  if (h < 5) return 'Xayrli tun'
-  if (h < 12) return 'Xayrli tong'
-  if (h < 18) return 'Xayrli kun'
-  return 'Xayrli kech'
+  if (h < 5) return t('greet.night')
+  if (h < 12) return t('greet.morning')
+  if (h < 18) return t('greet.afternoon')
+  return t('greet.evening')
 }
 
 function Upcoming({ items }) {
@@ -47,14 +49,14 @@ function Upcoming({ items }) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-5 shadow-lg shadow-black/5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-base font-bold text-ink">Keyingi muddatlar</h3>
+        <h3 className="font-display text-base font-bold text-ink">{t('dash.nextDeadlines')}</h3>
         <Link to="/calendar" className="text-xs font-bold text-accent hover:underline">
-          Kalendar →
+          {t('nav.calendar')} →
         </Link>
       </div>
       {list.length === 0 ? (
         <p className="rounded-xl border border-dashed border-line px-4 py-6 text-center text-xs text-muted">
-          Muddati bor vazifalar yo'q — bo'sh vaqt.
+          {t('dash.noDeadlines')}
         </p>
       ) : (
         <ul className="flex flex-col gap-2">
@@ -137,13 +139,13 @@ export default function Dashboard() {
         <div className="relative flex flex-wrap items-center justify-between gap-5">
           <div>
             <p className="mb-2 inline-flex rounded-full border border-line bg-surface px-3 py-1 text-[11px] font-bold tracking-widest text-accent uppercase">
-              Challendj №1 · Rejalashtiruvchi
+              {t('dash.badge')}
             </p>
             <h1 className="font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">
               {greet()}, @{user?.username}
             </h1>
             <p className="mt-1.5 text-sm text-muted sm:text-base">
-              Bugungi rejangizni ko'ring — muddatlar ustidan nazorat, fokus esa keyingi sahifada.
+              {t('dash.hero')}
             </p>
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
@@ -155,7 +157,7 @@ export default function Dashboard() {
               className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-line bg-surface px-4 py-2 text-xs font-bold text-muted transition hover:text-ink"
             >
               <Refresh size={13} />
-              Yangilash
+              {t('dash.refresh')}
             </button>
           </div>
         </div>
@@ -163,10 +165,10 @@ export default function Dashboard() {
 
       {/* Stat cards */}
       <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard icon={<Collection size={18} />} label="Jami vazifa" value={items.length} hint="jami" tone="bg-accent-soft text-accent" />
-        <StatCard icon={<Check size={18} />} label="Bajarilgan" value={done} hint={`${pending} qoldi`} tone="bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" />
-        <StatCard icon={<Clock size={18} />} label="Bugun bajarildi" value={doneToday} hint="bugun" tone="bg-sky-500/15 text-sky-600 dark:text-sky-300" />
-        <StatCard icon={<Alert size={18} />} label="Muddati o'tgan" value={overdue} hint={overdue ? 'zudlik bilan' : 'hozircha yo\'q'} tone={overdue ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300' : 'bg-surface text-faint'} />
+        <StatCard icon={<Collection size={18} />} label={t('dash.total')} value={items.length} hint={t('dash.totalHint')} tone="bg-accent-soft text-accent" />
+        <StatCard icon={<Check size={18} />} label={t('dash.done')} value={done} hint={t('dash.doneHint', { n: pending })} tone="bg-emerald-500/15 text-emerald-600 dark:text-emerald-300" />
+        <StatCard icon={<Clock size={18} />} label={t('dash.todayDone')} value={doneToday} hint={t('dash.todayDoneHint')} tone="bg-sky-500/15 text-sky-600 dark:text-sky-300" />
+        <StatCard icon={<Alert size={18} />} label={t('dash.overdue')} value={overdue} hint={overdue ? t('dash.overdueHintUrgent') : t('dash.overdueHintNone')} tone={overdue ? 'bg-rose-500/15 text-rose-600 dark:text-rose-300' : 'bg-surface text-faint'} />
       </section>
 
       {/* Fokus CTA */}
@@ -180,9 +182,9 @@ export default function Dashboard() {
               <Timer size={18} />
             </span>
             <div>
-              <p className="font-display text-sm font-bold text-ink">Fokus vaqti</p>
+              <p className="font-display text-sm font-bold text-ink">{t('dash.focusCta')}</p>
               <p className="mt-0.5 text-xs text-muted">
-                {active.length} ta faol vazifa bor. Pomodoro rejimini yoqib, ishni boshlang.
+                {t('dash.focusCtaText', { n: active.length })}
               </p>
             </div>
           </div>
@@ -198,7 +200,7 @@ export default function Dashboard() {
 
           <div className="rounded-2xl border border-line bg-card p-4 shadow-lg shadow-black/5 sm:p-5">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="font-display text-base font-bold text-ink">Vazifalar</h2>
+              <h2 className="font-display text-base font-bold text-ink">{t('dash.tasksTitle')}</h2>
               <span className="rounded-full bg-surface px-3 py-1 text-xs font-bold text-muted">
                 {visible.length} / {items.length}
               </span>
@@ -228,6 +230,7 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col gap-4">
+          <GoalsCard />
           <Progress done={done} total={items.length} />
           <FanStats items={items} />
           <Upcoming items={items} />

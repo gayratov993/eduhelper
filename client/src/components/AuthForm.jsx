@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { login, register, clearError } from '../store/authSlice'
+import { t } from '../i18n'
 import { Logo } from './brand'
+import LangSwitch from './LangSwitch'
 import { Alert } from './icons'
 
 export default function AuthForm() {
@@ -34,18 +36,19 @@ export default function AuthForm() {
       <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(50%_35%_at_50%_0%,rgba(99,102,241,0.28),transparent),radial-gradient(35%_25%_at_90%_100%,rgba(168,85,247,0.18),transparent)] dark:bg-[radial-gradient(50%_35%_at_50%_0%,rgba(99,102,241,0.25),transparent),radial-gradient(35%_25%_at_90%_100%,rgba(139,92,246,0.15),transparent)]" />
 
       <div className="relative w-full max-w-md">
+        <div className="mb-3 flex justify-end">
+          <LangSwitch compact />
+        </div>
         <div className="rounded-3xl border border-line bg-card p-8 shadow-2xl shadow-black/10">
           <div className="mb-5 flex items-center gap-3">
             <Logo size={48} />
             <div>
               <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">EduHelper</h1>
-              <p className="text-xs font-semibold text-muted">O'quv vazifalarini boshqarish</p>
+              <p className="text-xs font-semibold text-muted">{t('auth.tagline')}</p>
             </div>
           </div>
           <p className="mb-6 text-sm text-muted">
-            {mode === 'login'
-              ? 'Profilga kirib, vazifalaringizni ko\'ring'
-              : 'Hisob yarating — 30 soniyada boshlang'}
+            {mode === 'login' ? t('auth.loginIntro') : t('auth.registerIntro')}
           </p>
 
           <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-line bg-app p-1">
@@ -58,7 +61,7 @@ export default function AuthForm() {
                   mode === m ? 'bg-accent text-white shadow' : 'text-muted hover:text-ink'
                 }`}
               >
-                {m === 'login' ? 'Kirish' : 'Ro\'yxatdan o\'tish'}
+                {m === 'login' ? t('auth.login') : t('auth.register')}
               </button>
             ))}
           </div>
@@ -78,7 +81,7 @@ export default function AuthForm() {
               type="text"
               ref={usernameRef}
               name="username"
-              placeholder={mode === 'register' ? 'Foydalanuvchi nomi (3-20 belgi)' : 'Foydalanuvchi nomi'}
+              placeholder={mode === 'register' ? t('auth.usernameHint') : t('auth.username')}
               autoComplete="username"
               className="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
             />
@@ -86,7 +89,7 @@ export default function AuthForm() {
               type="password"
               ref={passwordRef}
               name="password"
-              placeholder={mode === 'register' ? 'Parol (kamida 6 belgi)' : 'Parol'}
+              placeholder={mode === 'register' ? t('auth.passwordHint') : t('auth.password')}
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               className="w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink outline-none transition focus:border-accent/60 focus:ring-2 focus:ring-accent/25"
             />
@@ -95,14 +98,12 @@ export default function AuthForm() {
               disabled={submitting}
               className="mt-1 cursor-pointer rounded-xl bg-accent px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? 'Yuborilmoqda…' : mode === 'login' ? 'Kirish →' : 'Hisob yaratish →'}
+              {submitting ? t('auth.submitting') : mode === 'login' ? t('auth.loginCta') : t('auth.registerCta')}
             </button>
           </form>
         </div>
 
-        <p className="mt-4 text-center text-xs text-faint">
-          Har bir foydalanuvchi faqat o'z vazifalarini ko'radi · JWT autentifikatsiya
-        </p>
+        <p className="mt-4 text-center text-xs text-faint">{t('auth.footer')}</p>
       </div>
     </div>
   )

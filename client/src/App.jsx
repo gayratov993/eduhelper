@@ -10,6 +10,7 @@ import Stats from './pages/Stats'
 import CalendarPage from './pages/CalendarPage'
 import Focus from './pages/Focus'
 import Profile from './pages/Profile'
+import { useLang } from './i18n'
 
 function Splash() {
   return (
@@ -25,6 +26,7 @@ function Splash() {
 export default function App() {
   const dispatch = useDispatch()
   const { user, initializing } = useSelector((s) => s.auth)
+  const { lang } = useLang()
 
   useEffect(() => {
     dispatch(initialize())

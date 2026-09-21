@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { useSelector } from 'react-redux'
 import { isSameDay, startOfDay } from '../utils/date'
 import { FAN_STYLE, BADGE_BASE } from '../constants'
+import { t, langCode, LOCALES, LANG_MONTHS, LANG_WEEKDAYS } from '../i18n'
 import { Calendar, ChevronLeft, ChevronRight, Check } from '../components/icons'
-
-const MONTHS = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
-const WEEKDAYS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya']
 
 function buildWeeks(cursor) {
   const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1)
@@ -32,6 +30,8 @@ export default function CalendarPage() {
 
   const weeks = buildWeeks(cursor)
   const today = startOfDay(new Date())
+  const months = LANG_MONTHS[langCode()]
+  const weekdays = LANG_WEEKDAYS[langCode()]
 
   function moveMonth(n) {
     const next = new Date(cursor.getFullYear(), cursor.getMonth() + n, 1)
@@ -58,25 +58,25 @@ export default function CalendarPage() {
             <Calendar size={22} />
           </span>
           <div>
-            <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">Kalendar</h1>
-            <p className="mt-0.5 text-sm text-muted">Har bir kunga tushgan vazifa muddatlari.</p>
+            <h1 className="font-display text-2xl font-extrabold text-ink sm:text-3xl">{t('calendar.header')}</h1>
+            <p className="mt-0.5 text-sm text-muted">{t('calendar.headerText')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => moveMonth(-1)}
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-xl border border-line bg-card text-muted transition hover:text-ink"
-            aria-label="Oldingi oy"
+            aria-label={t('calendar.prev')}
           >
             <ChevronLeft size={16} />
           </button>
           <button onClick={jumpToday} className="cursor-pointer rounded-xl border border-line bg-card px-3 py-2 text-sm font-bold text-muted transition hover:text-ink">
-            Bugun
+            {t('calendar.today')}
           </button>
           <button
             onClick={() => moveMonth(1)}
             className="grid h-9 w-9 cursor-pointer place-items-center rounded-xl border border-line bg-card text-muted transition hover:text-ink"
-            aria-label="Keyingi oy"
+            aria-label={t('calendar.next')}
           >
             <ChevronRight size={16} />
           </button>
@@ -87,17 +87,17 @@ export default function CalendarPage() {
         <section className="rounded-2xl border border-line bg-card p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-xl font-bold text-ink">
-              {MONTHS[cursor.getMonth()]} {cursor.getFullYear()}
+              {months[cursor.getMonth()]} {cursor.getFullYear()}
             </h2>
             <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted">
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-accent" /> Bu kun</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-rose-500" /> Muddati o'tgan</span>
-              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> Bajarilgan</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-accent" /> {t('calendar.legendToday')}</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-rose-500" /> {t('calendar.legendOverdue')}</span>
+              <span className="flex items-center gap-1"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> {t('calendar.legendDone')}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-7 gap-1.5 text-center">
-            {WEEKDAYS.map((w) => (
+            {weekdays.map((w) => (
               <span key={w} className="pb-1 text-[11px] font-bold tracking-wider text-faint uppercase">{w}</span>
             ))}
 
@@ -139,20 +139,20 @@ export default function CalendarPage() {
 
         <section className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-5">
           <h3 className="font-display text-base font-bold text-ink">
-            {selected.toLocaleDateString('uz-UZ', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {selected.toLocaleDateString(LOCALES[langCode()], { weekday: 'long', day: 'numeric', month: 'long' })}
           </h3>
           {selectedTasks.length === 0 ? (
             <p className="rounded-xl border border-dashed border-line px-4 py-6 text-center text-xs text-muted">
-              Bu kunga belgilangan vazifa yo'q.
+              {t('calendar.noTasks')}
             </p>
           ) : (
             <ul className="flex flex-col gap-2">
-              {selectedTasks.map((t) => (
-                <li key={t._id} className={`rounded-xl border px-3.5 py-2.5 ${t.isDone ? 'border-line bg-surface opacity-70' : 'border-line bg-surface'}`}>
-                  <p className={`text-sm font-semibold ${t.isDone ? 'text-muted line-through' : 'text-ink'}`}>{t.title}</p>
-                  <span className={`inline-flex items-center gap-1 ${BADGE_BASE} mt-2 ${t.isDone ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/40 dark:text-emerald-300' : FAN_STYLE[t.fan]?.badge || FAN_STYLE.Boshqa.badge}`}>
-                    {t.isDone && <Check size={11} />}
-                    {t.isDone ? 'Bajarilgan' : t.fan}
+              {selectedTasks.map((task) => (
+                <li key={task._id} className={`rounded-xl border px-3.5 py-2.5 ${task.isDone ? 'border-line bg-surface opacity-70' : 'border-line bg-surface'}`}>
+                  <p className={`text-sm font-semibold ${task.isDone ? 'text-muted line-through' : 'text-ink'}`}>{task.title}</p>
+                  <span className={`inline-flex items-center gap-1 ${BADGE_BASE} mt-2 ${task.isDone ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/40 dark:text-emerald-300' : FAN_STYLE[task.fan]?.badge || FAN_STYLE.Boshqa.badge}`}>
+                    {task.isDone && <Check size={11} />}
+                    {task.isDone ? t('calendar.done') : task.fan}
                   </span>
                 </li>
               ))}
